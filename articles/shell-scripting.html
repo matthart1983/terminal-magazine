@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn shell scripting fundamentals. Automate tasks and boost your productivity with bash scripts.">
+    <title>Shell Scripting Fundamentals | Terminal Magazine</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="article.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="../index.html">[Home]</a></li>
+                <li><a href="../index.html#tutorials" class="active">[Tutorials]</a></li>
+                <li><a href="../index.html#news">[News]</a></li>
+                <li><a href="../index.html#tips">[Tips & Tricks]</a></li>
+                <li><a href="../index.html#howto">[How-Tos]</a></li>
+                <li><a href="../index.html#about">[About]</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <div class="container">
+            <p class="article-meta">
+                <span class="prompt">$</span> ./tutorials/shell-scripting.sh
+            </p>
+            <h1>Shell Scripting Fundamentals</h1>
+            <p class="article-meta">
+                By <span class="author">bashmaster</span> |
+                18 min read |
+                Beginner to Intermediate |
+                Published: December 2025
+            </p>
+        </div>
+    </header>
+
+    <main class="article-body">
+        <p class="article-excerpt">
+            Shell scripts are the duct tape of Unix. They let you automate repetitive tasks,
+            glue programs together, and accomplish in seconds what would take minutes by hand.
+            Every Linux user should know at least the basics.
+        </p>
+
+        <h2>What is a Shell Script?</h2>
+
+        <p>
+            A shell script is simply a text file containing a series of commands. Instead of
+            typing commands one by one, you write them in a file and run them all at once.
+            The shell (usually Bash) reads the file and executes each command in order.
+        </p>
+
+        <h2>Your First Script</h2>
+
+        <p>Let's create a simple script:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ nano hello.sh</span></code>
+        </div>
+
+        <p>Add this content:</p>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+# My first shell script
+
+echo "Hello, World!"
+echo "Today is $(date +%A)"
+echo "You are logged in as: $USER"</span></code>
+        </div>
+
+        <p>Now make it executable and run it:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ chmod +x hello.sh</span>
+<span class="command">$ ./hello.sh</span>
+<span class="output">Hello, World!
+Today is Saturday
+You are logged in as: user</span></code>
+        </div>
+
+        <h2>The Shebang Line</h2>
+
+        <p>
+            The first line <code>#!/bin/bash</code> is called the <strong>shebang</strong>.
+            It tells the system which interpreter to use. Common shebangs include:
+        </p>
+
+        <table>
+            <tr>
+                <th>Shebang</th>
+                <th>Interpreter</th>
+            </tr>
+            <tr><td><code>#!/bin/bash</code></td><td>Bash shell</td></tr>
+            <tr><td><code>#!/bin/sh</code></td><td>POSIX shell (more portable)</td></tr>
+            <tr><td><code>#!/usr/bin/env bash</code></td><td>Bash (finds it in PATH)</td></tr>
+            <tr><td><code>#!/usr/bin/python3</code></td><td>Python 3</td></tr>
+        </table>
+
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> Use <code>#!/usr/bin/env bash</code> for better
+            portability across different systems where bash might be in different locations.</p>
+        </div>
+
+        <h2>Variables</h2>
+
+        <p>Variables store data for later use. No spaces around the <code>=</code> sign!</p>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+
+# Assigning variables (no spaces!)
+name="Terminal Magazine"
+year=2025
+files=$(ls | wc -l)
+
+# Using variables (prefix with $)
+echo "Welcome to $name"
+echo "Year: $year"
+echo "Files in directory: $files"
+
+# Curly braces for clarity
+echo "Reading ${name}'s articles"</span></code>
+        </div>
+
+        <h3>Special Variables</h3>
+
+        <table>
+            <tr>
+                <th>Variable</th>
+                <th>Meaning</th>
+            </tr>
+            <tr><td><code>$0</code></td><td>Script name</td></tr>
+            <tr><td><code>$1, $2...</code></td><td>Command line arguments</td></tr>
+            <tr><td><code>$#</code></td><td>Number of arguments</td></tr>
+            <tr><td><code>$@</code></td><td>All arguments</td></tr>
+            <tr><td><code>$?</code></td><td>Exit status of last command</td></tr>
+            <tr><td><code>$$</code></td><td>Current process ID</td></tr>
+            <tr><td><code>$USER</code></td><td>Current username</td></tr>
+            <tr><td><code>$HOME</code></td><td>Home directory</td></tr>
+            <tr><td><code>$PWD</code></td><td>Current directory</td></tr>
+        </table>
+
+        <h2>User Input</h2>
+
+        <p>Use <code>read</code> to get input from the user:</p>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+
+echo -n "What is your name? "
+read username
+
+echo "Hello, $username!"
+
+# Read with a prompt (-p flag)
+read -p "Enter your age: " age
+echo "You are $age years old"
+
+# Silent input for passwords (-s flag)
+read -sp "Enter password: " password
+echo  # Add newline after hidden input
+echo "Password received (${#password} characters)"</span></code>
+        </div>
+
+        <h2>Conditionals</h2>
+
+        <p>Make decisions with <code>if</code> statements:</p>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+
+read -p "Enter a number: " num
+
+if [ $num -gt 10 ]; then
+    echo "$num is greater than 10"
+elif [ $num -eq 10 ]; then
+    echo "$num is exactly 10"
+else
+    echo "$num is less than 10"
+fi</span></code>
+        </div>
+
+        <h3>Test Operators</h3>
+
+        <p><strong>Numeric comparisons:</strong></p>
+
+        <table>
+            <tr>
+                <th>Operator</th>
+                <th>Meaning</th>
+            </tr>
+            <tr><td><code>-eq</code></td><td>Equal</td></tr>
+            <tr><td><code>-ne</code></td><td>Not equal</td></tr>
+            <tr><td><code>-gt</code></td><td>Greater than</td></tr>
+            <tr><td><code>-ge</code></td><td>Greater than or equal</td></tr>
+            <tr><td><code>-lt</code></td><td>Less than</td></tr>
+            <tr><td><code>-le</code></td><td>Less than or equal</td></tr>
+        </table>
+
+        <p><strong>String comparisons:</strong></p>
+
+        <table>
+            <tr>
+                <th>Operator</th>
+                <th>Meaning</th>
+            </tr>
+            <tr><td><code>=</code></td><td>Equal</td></tr>
+            <tr><td><code>!=</code></td><td>Not equal</td></tr>
+            <tr><td><code>-z</code></td><td>String is empty</td></tr>
+            <tr><td><code>-n</code></td><td>String is not empty</td></tr>
+        </table>
+
+        <p><strong>File tests:</strong></p>
+
+        <table>
+            <tr>
+                <th>Operator</th>
+                <th>Meaning</th>
+            </tr>
+            <tr><td><code>-e</code></td><td>File exists</td></tr>
+            <tr><td><code>-f</code></td><td>Is a regular file</td></tr>
+            <tr><td><code>-d</code></td><td>Is a directory</td></tr>
+            <tr><td><code>-r</code></td><td>Is readable</td></tr>
+            <tr><td><code>-w</code></td><td>Is writable</td></tr>
+            <tr><td><code>-x</code></td><td>Is executable</td></tr>
+        </table>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+
+file="/etc/passwd"
+
+if [ -e "$file" ]; then
+    echo "$file exists"
+
+    if [ -r "$file" ]; then
+        echo "And it's readable"
+    fi
+fi
+
+# Check if directory
+if [ -d "/home" ]; then
+    echo "/home is a directory"
+fi</span></code>
+        </div>
+
+        <h2>Loops</h2>
+
+        <h3>For Loop</h3>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+
+# Loop through a list
+for color in red green blue; do
+    echo "Color: $color"
+done
+
+# Loop through files
+for file in *.txt; do
+    echo "Processing: $file"
+done
+
+# C-style for loop
+for ((i=1; i<=5; i++)); do
+    echo "Number: $i"
+done
+
+# Loop through command output
+for user in $(cat /etc/passwd | cut -d: -f1); do
+    echo "User: $user"
+done</span></code>
+        </div>
+
+        <h3>While Loop</h3>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+
+# Count down
+count=5
+while [ $count -gt 0 ]; do
+    echo "T-minus $count"
+    ((count--))
+    sleep 1
+done
+echo "Liftoff!"
+
+# Read file line by line
+while read line; do
+    echo "Line: $line"
+done < /etc/hostname</span></code>
+        </div>
+
+        <h2>Functions</h2>
+
+        <p>Functions let you organize and reuse code:</p>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+
+# Define a function
+greet() {
+    echo "Hello, $1!"
+}
+
+# Function with return value
+add_numbers() {
+    local result=$(( $1 + $2 ))
+    echo $result
+}
+
+# Call functions
+greet "World"
+greet "Linux"
+
+sum=$(add_numbers 5 3)
+echo "5 + 3 = $sum"</span></code>
+        </div>
+
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> Use <code>local</code> for variables inside functions
+            to avoid polluting the global scope.</p>
+        </div>
+
+        <h2>Practical Examples</h2>
+
+        <h3>Backup Script</h3>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+# Simple backup script
+
+SOURCE="/home/$USER/Documents"
+DEST="/home/$USER/Backups"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="backup_$DATE.tar.gz"
+
+# Create backup directory if needed
+mkdir -p "$DEST"
+
+# Create the backup
+echo "Creating backup of $SOURCE..."
+tar -czf "$DEST/$BACKUP_FILE" "$SOURCE" 2>/dev/null
+
+if [ $? -eq 0 ]; then
+    echo "Backup successful: $DEST/$BACKUP_FILE"
+    echo "Size: $(du -h "$DEST/$BACKUP_FILE" | cut -f1)"
+else
+    echo "Backup failed!"
+    exit 1
+fi</span></code>
+        </div>
+
+        <h3>System Info Script</h3>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+# Display system information
+
+echo "=============================="
+echo "     SYSTEM INFORMATION"
+echo "=============================="
+echo ""
+echo "Hostname: $(hostname)"
+echo "OS: $(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)"
+echo "Kernel: $(uname -r)"
+echo "Uptime: $(uptime -p)"
+echo ""
+echo "CPU: $(grep 'model name' /proc/cpuinfo | head -1 | cut -d':' -f2)"
+echo "Memory: $(free -h | awk '/Mem:/ {print $3 "/" $2}')"
+echo "Disk: $(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 " used)"}')"
+echo ""
+echo "IP Address: $(hostname -I | awk '{print $1}')"
+echo "=============================="</span></code>
+        </div>
+
+        <h3>Log Watcher</h3>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+# Watch for errors in a log file
+
+LOG_FILE="/var/log/syslog"
+KEYWORD="error"
+
+echo "Watching $LOG_FILE for '$KEYWORD'..."
+echo "Press Ctrl+C to stop"
+echo ""
+
+tail -f "$LOG_FILE" | while read line; do
+    if echo "$line" | grep -qi "$KEYWORD"; then
+        echo "[$(date +%H:%M:%S)] $line"
+    fi
+done</span></code>
+        </div>
+
+        <h2>Error Handling</h2>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+
+# Exit on any error
+set -e
+
+# Exit on undefined variable
+set -u
+
+# Better: combine them
+set -eu
+
+# Custom error handling
+trap 'echo "Error on line $LINENO"; exit 1' ERR
+
+# Check command success
+if ! command -v git &> /dev/null; then
+    echo "git is not installed"
+    exit 1
+fi
+
+# Or use || for inline error handling
+mkdir /some/path || { echo "Failed to create directory"; exit 1; }</span></code>
+        </div>
+
+        <h2>Debugging Scripts</h2>
+
+        <div class="code-block">
+            <code><span class="comment"># Run with debug output</span>
+<span class="command">$ bash -x myscript.sh</span>
+
+<span class="comment"># Or add this to your script</span>
+<span class="output">#!/bin/bash
+set -x  # Enable debug mode
+# ... your code ...
+set +x  # Disable debug mode</span></code>
+        </div>
+
+        <h2>Best Practices</h2>
+
+        <ul>
+            <li><strong>Always quote variables:</strong> <code>"$var"</code> prevents word splitting</li>
+            <li><strong>Use meaningful names:</strong> <code>$backup_dir</code> not <code>$bd</code></li>
+            <li><strong>Add comments:</strong> Future you will thank present you</li>
+            <li><strong>Check for errors:</strong> Don't assume commands succeed</li>
+            <li><strong>Use shellcheck:</strong> <code>shellcheck myscript.sh</code> finds bugs</li>
+            <li><strong>Start with set -eu:</strong> Catch errors and typos early</li>
+        </ul>
+
+        <div class="warning-box">
+            <p><strong>Warning:</strong> Always test scripts on non-critical data first.
+            A typo in <code>rm -rf $var/</code> where <code>$var</code> is empty becomes
+            <code>rm -rf /</code> — disaster!</p>
+        </div>
+
+        <h2>Wrapping Up</h2>
+
+        <p>
+            You now have the fundamentals of shell scripting. Start simple — automate a task
+            you do frequently. Maybe it's backing up files, organizing downloads, or generating
+            reports. Each script you write builds your skills.
+        </p>
+
+        <p>
+            The best scripts start as solutions to your own problems. Keep them in a
+            <code>~/bin</code> directory, add it to your PATH, and soon you'll have your own
+            collection of handy tools.
+        </p>
+
+        <nav class="article-nav">
+            <a href="vim.html">[← Previous: Vim Tutorial]</a>
+            <a href="file-permissions.html">[Next: File Permissions →]</a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>
+                    <span class="blink">_</span>
+                    Terminal Magazine |
+                    Licensed under CC BY-SA 4.0
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

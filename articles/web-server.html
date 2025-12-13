@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn to set up Apache or Nginx web server on Linux. Step-by-step guide for beginners.">
+    <title>Setting Up Your First Web Server | Terminal Magazine</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="article.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="../index.html">[Home]</a></li>
+                <li><a href="../index.html#tutorials" class="active">[Tutorials]</a></li>
+                <li><a href="../index.html#news">[News]</a></li>
+                <li><a href="../index.html#tips">[Tips & Tricks]</a></li>
+                <li><a href="../index.html#howto">[How-Tos]</a></li>
+                <li><a href="../index.html#about">[About]</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <div class="container">
+            <p class="article-meta">
+                <span class="prompt">$</span> cat /tutorials/web-server.md
+            </p>
+            <h1>Setting Up Your First Web Server</h1>
+            <p class="article-meta">
+                By <span class="author">sysadmin</span> |
+                20 min read |
+                Intermediate |
+                Published: December 2025
+            </p>
+        </div>
+    </header>
+
+    <main class="article-body">
+        <p class="article-excerpt">
+            Every Linux enthusiast should know how to set up a web server. Whether you're
+            hosting a personal blog, testing web applications, or learning about networking,
+            this skill opens up a world of possibilities.
+        </p>
+
+        <h2>Choosing Your Web Server</h2>
+
+        <p>
+            The two most popular web servers in the Linux world are <strong>Apache</strong>
+            and <strong>Nginx</strong>. Here's a quick comparison:
+        </p>
+
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Apache</th>
+                <th>Nginx</th>
+            </tr>
+            <tr>
+                <td>Config Style</td>
+                <td>.htaccess files, flexible</td>
+                <td>Centralized config</td>
+            </tr>
+            <tr>
+                <td>Performance</td>
+                <td>Good for dynamic content</td>
+                <td>Excellent for static files</td>
+            </tr>
+            <tr>
+                <td>Memory Usage</td>
+                <td>Higher</td>
+                <td>Lower</td>
+            </tr>
+            <tr>
+                <td>Learning Curve</td>
+                <td>Easier for beginners</td>
+                <td>Slightly steeper</td>
+            </tr>
+        </table>
+
+        <p>We'll cover both in this tutorial. Pick whichever appeals to you!</p>
+
+        <h2>Option A: Installing Apache</h2>
+
+        <p>Apache (httpd) has been around since 1995 and powers millions of websites.</p>
+
+        <div class="code-block">
+            <code><span class="comment"># On Debian/Ubuntu</span>
+<span class="command">$ sudo apt update</span>
+<span class="command">$ sudo apt install apache2</span>
+
+<span class="comment"># On Fedora/RHEL</span>
+<span class="command">$ sudo dnf install httpd</span>
+
+<span class="comment"># Start the service</span>
+<span class="command">$ sudo systemctl start apache2</span>   <span class="comment"># Debian/Ubuntu</span>
+<span class="command">$ sudo systemctl start httpd</span>     <span class="comment"># Fedora/RHEL</span>
+
+<span class="comment"># Enable on boot</span>
+<span class="command">$ sudo systemctl enable apache2</span></code>
+        </div>
+
+        <p>Now open your browser and go to <code>http://localhost</code>. You should see the default Apache page!</p>
+
+        <h3>Apache Directory Structure</h3>
+
+        <div class="code-block">
+            <code><span class="output">/etc/apache2/              # Main config directory (Debian)
+├── apache2.conf           # Main configuration file
+├── sites-available/       # Virtual host configs
+├── sites-enabled/         # Symlinks to enabled sites
+└── mods-enabled/          # Enabled modules
+
+/var/www/html/             # Default web root</span></code>
+        </div>
+
+        <h3>Creating Your First Page</h3>
+
+        <div class="code-block">
+            <code><span class="comment"># Create a simple HTML page</span>
+<span class="command">$ sudo nano /var/www/html/index.html</span></code>
+        </div>
+
+        <p>Add this content:</p>
+
+        <div class="code-block">
+            <code><span class="output">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My First Server&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Hello from Apache!&lt;/h1&gt;
+    &lt;p&gt;My Linux web server is working.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</span></code>
+        </div>
+
+        <h2>Option B: Installing Nginx</h2>
+
+        <p>Nginx (pronounced "engine-x") is known for its performance and low resource usage.</p>
+
+        <div class="code-block">
+            <code><span class="comment"># On Debian/Ubuntu</span>
+<span class="command">$ sudo apt update</span>
+<span class="command">$ sudo apt install nginx</span>
+
+<span class="comment"># On Fedora/RHEL</span>
+<span class="command">$ sudo dnf install nginx</span>
+
+<span class="comment"># Start and enable</span>
+<span class="command">$ sudo systemctl start nginx</span>
+<span class="command">$ sudo systemctl enable nginx</span></code>
+        </div>
+
+        <h3>Nginx Directory Structure</h3>
+
+        <div class="code-block">
+            <code><span class="output">/etc/nginx/                # Main config directory
+├── nginx.conf             # Main configuration
+├── sites-available/       # Server block configs
+├── sites-enabled/         # Enabled sites (symlinks)
+└── conf.d/                # Additional configs
+
+/var/www/html/             # Default web root</span></code>
+        </div>
+
+        <h2>Setting Up a Virtual Host</h2>
+
+        <p>
+            Virtual hosts let you serve multiple websites from one server. Let's create
+            one for a test site.
+        </p>
+
+        <h3>Apache Virtual Host</h3>
+
+        <div class="code-block">
+            <code><span class="command">$ sudo nano /etc/apache2/sites-available/mysite.conf</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="output">&lt;VirtualHost *:80&gt;
+    ServerName mysite.local
+    ServerAlias www.mysite.local
+    DocumentRoot /var/www/mysite
+
+    &lt;Directory /var/www/mysite&gt;
+        AllowOverride All
+        Require all granted
+    &lt;/Directory&gt;
+
+    ErrorLog ${APACHE_LOG_DIR}/mysite_error.log
+    CustomLog ${APACHE_LOG_DIR}/mysite_access.log combined
+&lt;/VirtualHost&gt;</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="comment"># Create the directory and enable the site</span>
+<span class="command">$ sudo mkdir -p /var/www/mysite</span>
+<span class="command">$ sudo a2ensite mysite.conf</span>
+<span class="command">$ sudo systemctl reload apache2</span></code>
+        </div>
+
+        <h3>Nginx Server Block</h3>
+
+        <div class="code-block">
+            <code><span class="command">$ sudo nano /etc/nginx/sites-available/mysite</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="output">server {
+    listen 80;
+    server_name mysite.local www.mysite.local;
+    root /var/www/mysite;
+    index index.html index.htm;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    error_log /var/log/nginx/mysite_error.log;
+    access_log /var/log/nginx/mysite_access.log;
+}</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="comment"># Enable the site</span>
+<span class="command">$ sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/</span>
+<span class="command">$ sudo nginx -t</span>  <span class="comment"># Test config</span>
+<span class="command">$ sudo systemctl reload nginx</span></code>
+        </div>
+
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> Add <code>127.0.0.1 mysite.local</code> to your
+            <code>/etc/hosts</code> file to test virtual hosts locally.</p>
+        </div>
+
+        <h2>Checking Server Status</h2>
+
+        <div class="code-block">
+            <code><span class="comment"># Check if server is running</span>
+<span class="command">$ sudo systemctl status apache2</span>
+<span class="command">$ sudo systemctl status nginx</span>
+
+<span class="comment"># View error logs</span>
+<span class="command">$ sudo tail -f /var/log/apache2/error.log</span>
+<span class="command">$ sudo tail -f /var/log/nginx/error.log</span>
+
+<span class="comment"># Test configuration</span>
+<span class="command">$ sudo apache2ctl configtest</span>
+<span class="command">$ sudo nginx -t</span></code>
+        </div>
+
+        <h2>Basic Security</h2>
+
+        <div class="warning-box">
+            <p><strong>Important:</strong> If your server is accessible from the internet,
+            security is critical. At minimum:</p>
+        </div>
+
+        <ul>
+            <li>Keep your software updated: <code>sudo apt update && sudo apt upgrade</code></li>
+            <li>Configure a firewall (see our firewall how-to)</li>
+            <li>Use HTTPS with Let's Encrypt (free SSL certificates)</li>
+            <li>Disable directory listing</li>
+            <li>Hide server version information</li>
+        </ul>
+
+        <h2>Wrapping Up</h2>
+
+        <p>
+            You now have a working web server! From here, you can:
+        </p>
+
+        <ul>
+            <li>Host static HTML/CSS/JS websites</li>
+            <li>Set up PHP with Apache (<code>sudo apt install libapache2-mod-php</code>)</li>
+            <li>Configure reverse proxies with Nginx</li>
+            <li>Add SSL certificates with Certbot</li>
+        </ul>
+
+        <p>
+            The web server is your gateway to self-hosting. Experiment, break things,
+            and learn. That's the Linux way.
+        </p>
+
+        <nav class="article-nav">
+            <a href="../index.html">[← Back to Home]</a>
+            <a href="vim.html">[Next: Vim Tutorial →]</a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>
+                    <span class="blink">_</span>
+                    Terminal Magazine |
+                    Licensed under CC BY-SA 4.0
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

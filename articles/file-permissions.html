@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Understand Linux file permissions: rwx, chmod, chown, groups, umask, and practical security tips.">
+    <title>Understanding File Permissions | Terminal Magazine</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="article.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="../index.html">[Home]</a></li>
+                <li><a href="../index.html#tutorials" class="active">[Tutorials]</a></li>
+                <li><a href="../index.html#news">[News]</a></li>
+                <li><a href="../index.html#tips">[Tips & Tricks]</a></li>
+                <li><a href="../index.html#howto">[How-Tos]</a></li>
+                <li><a href="../index.html#about">[About]</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <div class="container">
+            <p class="article-meta">
+                <span class="prompt">$</span> ls -l /tutorials/permissions.md
+            </p>
+            <h1>Understanding File Permissions</h1>
+            <p class="article-meta">
+                By <span class="author">rooted</span> |
+                10 min read |
+                Beginner |
+                Published: December 2025
+            </p>
+        </div>
+    </header>
+
+    <main class="article-body">
+        <p class="article-excerpt">
+            Permissions control who can read, write, or execute files and directories. Mastering
+            them is essential for both everyday safety and system administration.
+        </p>
+
+        <h2>Permission Basics</h2>
+        <p>Run <code>ls -l</code> to see permissions:</p>
+        <div class="code-block">
+            <code><span class="command">$ ls -l notes.txt</span>
+<span class="output">-rw-r--r-- 1 user user 1024 Dec 14 10:00 notes.txt</span></code>
+        </div>
+        <p>
+            The first block <code>-rw-r--r--</code> breaks down as: type + three triplets for
+            user, group, others.
+        </p>
+        <table>
+            <tr><th>Char</th><th>Meaning</th></tr>
+            <tr><td><code>-</code>/<code>d</code></td><td>File or directory</td></tr>
+            <tr><td><code>r</code></td><td>Read</td></tr>
+            <tr><td><code>w</code></td><td>Write</td></tr>
+            <tr><td><code>x</code></td><td>Execute (or enter, for directories)</td></tr>
+        </table>
+
+        <h2>Changing Permissions with chmod</h2>
+        <p>Symbolic mode is readable:</p>
+        <div class="code-block">
+            <code><span class="comment"># Give execute to user</span>
+<span class="command">$ chmod u+x script.sh</span>
+
+<span class="comment"># Remove write from group</span>
+<span class="command">$ chmod g-w notes.txt</span>
+
+<span class="comment"># Add read to others</span>
+<span class="command">$ chmod o+r report.pdf</span>
+
+<span class="comment"># Set exactly: user rwx, group rx, others rx</span>
+<span class="command">$ chmod u=rwx,g=rx,o=rx app</span></code>
+        </div>
+        <p>Numeric (octal) mode is compact:</p>
+        <div class="code-block">
+            <code><span class="comment"># 7 = rwx, 5 = r-x, 4 = r--</span>
+<span class="command">$ chmod 755 app</span>
+<span class="command">$ chmod 644 notes.txt</span></code>
+        </div>
+
+        <h2>Ownership with chown and chgrp</h2>
+        <div class="code-block">
+            <code><span class="comment"># Change owner</span>
+<span class="command">$ sudo chown alice notes.txt</span>
+
+<span class="comment"># Change group</span>
+<span class="command">$ sudo chgrp developers notes.txt</span>
+
+<span class="comment"># Change both</span>
+<span class="command">$ sudo chown bob:developers app</span></code>
+        </div>
+
+        <h2>Directories vs Files</h2>
+        <ul>
+            <li><strong>Read (r):</strong> list directory contents.</li>
+            <li><strong>Write (w):</strong> create/delete/rename entries.</li>
+            <li><strong>Execute (x):</strong> enter/access directory.</li>
+        </ul>
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> To delete a file in a directory, you need write permission on the directory, not the file.</p>
+        </div>
+
+        <h2>Setuid, Setgid, and Sticky Bit</h2>
+        <div class="code-block">
+            <code><span class="comment"># Setuid on executables (runs with file owner's privileges)</span>
+<span class="command">$ chmod u+s /usr/bin/someprog</span>
+
+<span class="comment"># Setgid on dirs (new files inherit group)</span>
+<span class="command">$ chmod g+s /projects/shared</span>
+
+<span class="comment"># Sticky bit on dirs (only owner can delete own files)</span>
+<span class="command">$ chmod +t /tmp</span></code>
+        </div>
+        <p>Octal adds a leading digit: <code>4755</code> (setuid), <code>2755</code> (setgid), <code>1755</code> (sticky).</p>
+
+        <h2>Default Permissions and umask</h2>
+        <div class="code-block">
+            <code><span class="comment"># Show current umask</span>
+<span class="command">$ umask</span>
+<span class="output">0022</span>
+
+<span class="comment"># Set temporary umask</span>
+<span class="command">$ umask 0077</span></code>
+        </div>
+        <p>
+            New files typically start at <code>666</code> (rw-rw-rw-) minus umask; directories at <code>777</code> minus umask.
+        </p>
+
+        <h2>Practical Scenarios</h2>
+        <h3>Private SSH Keys</h3>
+        <div class="code-block">
+            <code><span class="command">$ chmod 600 ~/.ssh/id_rsa</span></code>
+        </div>
+        <h3>Shared Project Directory</h3>
+        <div class="code-block">
+            <code><span class="command">$ sudo chgrp -R developers /projects/shared</span>
+<span class="command">$ sudo chmod -R g+rwX /projects/shared</span>
+<span class="command">$ sudo chmod g+s /projects/shared</span></code>
+        </div>
+
+        <h2>Wrapping Up</h2>
+        <p>
+            Permissions are a foundational Linux skill. With <code>chmod</code>, <code>chown</code>, and smart defaults, you can keep systems safe and collaborative.
+        </p>
+
+        <nav class="article-nav">
+            <a href="shell-scripting.html">[← Previous: Shell Scripting]</a>
+            <a href="../index.html">[Back to Home →]</a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>
+                    <span class="blink">_</span>
+                    Terminal Magazine |
+                    Licensed under CC BY-SA 4.0
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
