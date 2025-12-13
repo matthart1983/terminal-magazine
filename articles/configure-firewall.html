@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn to configure a Linux firewall with ufw and iptables. Essential security for servers and desktops.">
+    <title>Configure a Firewall | Terminal Magazine</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="article.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="../index.html">[Home]</a></li>
+                <li><a href="../index.html#tutorials">[Tutorials]</a></li>
+                <li><a href="../index.html#news">[News]</a></li>
+                <li><a href="../index.html#tips">[Tips & Tricks]</a></li>
+                <li><a href="../index.html#howto" class="active">[How-Tos]</a></li>
+                <li><a href="../index.html#about">[About]</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <div class="container">
+            <p class="article-meta">
+                <span class="prompt">$</span> sudo cat /how-to/firewall.md
+            </p>
+            <h1>Configure a Firewall</h1>
+            <p class="article-meta">
+                By <span class="author">netguard</span> |
+                15 min read |
+                Intermediate |
+                Published: December 2025
+            </p>
+        </div>
+    </header>
+
+    <main class="article-body">
+        <p class="article-excerpt">
+            A firewall is your first line of defense against network attacks. Whether you're
+            running a server or just want to lock down your desktop, configuring a firewall
+            is essential security practice.
+        </p>
+
+        <h2>Firewall Basics</h2>
+
+        <p>
+            A firewall controls network traffic based on rules. It can <strong>allow</strong>
+            or <strong>deny</strong> connections based on:
+        </p>
+        <ul>
+            <li>Port numbers (e.g., 80 for HTTP, 22 for SSH)</li>
+            <li>IP addresses (allow from specific sources)</li>
+            <li>Protocols (TCP, UDP, ICMP)</li>
+            <li>Direction (incoming vs outgoing)</li>
+        </ul>
+
+        <h2>ufw: The Easy Firewall</h2>
+
+        <p>
+            <strong>ufw</strong> (Uncomplicated Firewall) is a user-friendly front-end for
+            iptables. It's perfect for common scenarios and recommended for beginners.
+        </p>
+
+        <h3>Installing ufw</h3>
+
+        <div class="code-block">
+            <code><span class="comment"># Debian/Ubuntu (usually pre-installed)</span>
+<span class="command">$ sudo apt install ufw</span>
+
+<span class="comment"># Fedora/RHEL</span>
+<span class="command">$ sudo dnf install ufw</span>
+
+<span class="comment"># Check status</span>
+<span class="command">$ sudo ufw status</span>
+<span class="output">Status: inactive</span></code>
+        </div>
+
+        <h3>Basic ufw Configuration</h3>
+
+        <div class="code-block">
+            <code><span class="comment"># Set default policies (deny incoming, allow outgoing)</span>
+<span class="command">$ sudo ufw default deny incoming</span>
+<span class="command">$ sudo ufw default allow outgoing</span>
+
+<span class="comment"># Allow SSH (IMPORTANT: do this before enabling!)</span>
+<span class="command">$ sudo ufw allow ssh</span>
+<span class="output">Rules updated</span>
+
+<span class="comment"># Or specify the port number</span>
+<span class="command">$ sudo ufw allow 22/tcp</span>
+
+<span class="comment"># Enable the firewall</span>
+<span class="command">$ sudo ufw enable</span>
+<span class="output">Firewall is active and enabled on system startup</span></code>
+        </div>
+
+        <div class="warning-box">
+            <p><strong>Warning:</strong> If you're connected via SSH, <em>always</em> allow
+            SSH access before enabling the firewall, or you'll lock yourself out!</p>
+        </div>
+
+        <h3>Common ufw Rules</h3>
+
+        <div class="code-block">
+            <code><span class="comment"># Allow HTTP and HTTPS</span>
+<span class="command">$ sudo ufw allow http</span>
+<span class="command">$ sudo ufw allow https</span>
+<span class="comment"># Or by port number</span>
+<span class="command">$ sudo ufw allow 80/tcp</span>
+<span class="command">$ sudo ufw allow 443/tcp</span>
+
+<span class="comment"># Allow from specific IP</span>
+<span class="command">$ sudo ufw allow from 192.168.1.100</span>
+
+<span class="comment"># Allow specific port from specific IP</span>
+<span class="command">$ sudo ufw allow from 192.168.1.100 to any port 22</span>
+
+<span class="comment"># Allow subnet</span>
+<span class="command">$ sudo ufw allow from 192.168.1.0/24</span>
+
+<span class="comment"># Allow port range</span>
+<span class="command">$ sudo ufw allow 6000:6007/tcp</span>
+
+<span class="comment"># Deny specific port</span>
+<span class="command">$ sudo ufw deny 3306/tcp</span></code>
+        </div>
+
+        <h3>Managing ufw Rules</h3>
+
+        <div class="code-block">
+            <code><span class="comment"># View current rules</span>
+<span class="command">$ sudo ufw status</span>
+
+<span class="comment"># Verbose output with rule numbers</span>
+<span class="command">$ sudo ufw status numbered</span>
+<span class="output">Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere
+[ 2] 80/tcp                     ALLOW IN    Anywhere
+[ 3] 443/tcp                    ALLOW IN    Anywhere</span>
+
+<span class="comment"># Delete a rule by number</span>
+<span class="command">$ sudo ufw delete 2</span>
+
+<span class="comment"># Delete a rule by specification</span>
+<span class="command">$ sudo ufw delete allow 80/tcp</span>
+
+<span class="comment"># Disable firewall</span>
+<span class="command">$ sudo ufw disable</span>
+
+<span class="comment"># Reset all rules</span>
+<span class="command">$ sudo ufw reset</span></code>
+        </div>
+
+        <h3>Application Profiles</h3>
+
+        <p>ufw includes pre-configured profiles for common services:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># List available profiles</span>
+<span class="command">$ sudo ufw app list</span>
+<span class="output">Available applications:
+  Apache
+  Apache Full
+  Apache Secure
+  Nginx Full
+  Nginx HTTP
+  Nginx HTTPS
+  OpenSSH</span>
+
+<span class="comment"># Get info about a profile</span>
+<span class="command">$ sudo ufw app info 'Nginx Full'</span>
+<span class="output">Profile: Nginx Full
+Title: Web Server (Nginx, HTTP + HTTPS)
+Description: Small, but very powerful and efficient web server
+
+Ports:
+  80,443/tcp</span>
+
+<span class="comment"># Allow an application</span>
+<span class="command">$ sudo ufw allow 'Nginx Full'</span></code>
+        </div>
+
+        <h2>iptables: The Power User's Firewall</h2>
+
+        <p>
+            <strong>iptables</strong> is the traditional Linux firewall with granular control.
+            It's more complex but extremely powerful.
+        </p>
+
+        <h3>iptables Chains</h3>
+
+        <p>iptables organizes rules into chains:</p>
+        <ul>
+            <li><strong>INPUT:</strong> Incoming connections to your system</li>
+            <li><strong>OUTPUT:</strong> Outgoing connections from your system</li>
+            <li><strong>FORWARD:</strong> Packets routed through your system</li>
+        </ul>
+
+        <h3>Basic iptables Commands</h3>
+
+        <div class="code-block">
+            <code><span class="comment"># View current rules</span>
+<span class="command">$ sudo iptables -L -v -n</span>
+
+<span class="comment"># View with line numbers</span>
+<span class="command">$ sudo iptables -L --line-numbers</span>
+
+<span class="comment"># Allow established connections</span>
+<span class="command">$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT</span>
+
+<span class="comment"># Allow SSH</span>
+<span class="command">$ sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT</span>
+
+<span class="comment"># Allow HTTP and HTTPS</span>
+<span class="command">$ sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT</span>
+<span class="command">$ sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT</span>
+
+<span class="comment"># Allow loopback</span>
+<span class="command">$ sudo iptables -A INPUT -i lo -j ACCEPT</span>
+
+<span class="comment"># Drop all other incoming</span>
+<span class="command">$ sudo iptables -A INPUT -j DROP</span></code>
+        </div>
+
+        <h3>iptables Rule Anatomy</h3>
+
+        <div class="code-block">
+            <code><span class="output">iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+         │  │     │  │     │         │  │
+         │  │     │  │     │         │  └─ Action (ACCEPT/DROP/REJECT)
+         │  │     │  │     │         └──── Option: destination port
+         │  │     │  │     └──────────────── Port number
+         │  │     │  └────────────────────── Protocol
+         │  │     └───────────────────────── Match criteria
+         │  └─────────────────────────────── Chain (INPUT/OUTPUT/FORWARD)
+         └────────────────────────────────── Append rule</span></code>
+        </div>
+
+        <h3>Complete iptables Setup Script</h3>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+# Basic iptables firewall script
+
+# Flush existing rules
+iptables -F
+iptables -X
+
+# Set default policies
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT ACCEPT
+
+# Allow loopback
+iptables -A INPUT -i lo -j ACCEPT
+
+# Allow established connections
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow SSH (from specific IP for extra security)
+iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 22 -j ACCEPT
+
+# Allow HTTP/HTTPS
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Allow ping (optional)
+iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+# Log dropped packets (optional, for debugging)
+iptables -A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables-dropped: "
+
+# Save rules (Debian/Ubuntu)
+iptables-save > /etc/iptables/rules.v4</span></code>
+        </div>
+
+        <h3>Making iptables Rules Persistent</h3>
+
+        <div class="code-block">
+            <code><span class="comment"># Debian/Ubuntu: Install iptables-persistent</span>
+<span class="command">$ sudo apt install iptables-persistent</span>
+
+<span class="comment"># Save current rules</span>
+<span class="command">$ sudo netfilter-persistent save</span>
+
+<span class="comment"># Or manually</span>
+<span class="command">$ sudo iptables-save > /etc/iptables/rules.v4</span>
+<span class="command">$ sudo ip6tables-save > /etc/iptables/rules.v6</span>
+
+<span class="comment"># Restore rules</span>
+<span class="command">$ sudo iptables-restore < /etc/iptables/rules.v4</span></code>
+        </div>
+
+        <h2>firewalld: Red Hat's Firewall</h2>
+
+        <p>
+            <strong>firewalld</strong> is the default on RHEL, CentOS, and Fedora. It uses
+            zones for network management.
+        </p>
+
+        <div class="code-block">
+            <code><span class="comment"># Check status</span>
+<span class="command">$ sudo firewall-cmd --state</span>
+
+<span class="comment"># List active zones</span>
+<span class="command">$ sudo firewall-cmd --get-active-zones</span>
+
+<span class="comment"># Allow a service</span>
+<span class="command">$ sudo firewall-cmd --permanent --add-service=http</span>
+<span class="command">$ sudo firewall-cmd --permanent --add-service=https</span>
+
+<span class="comment"># Allow a port</span>
+<span class="command">$ sudo firewall-cmd --permanent --add-port=8080/tcp</span>
+
+<span class="comment"># Reload to apply changes</span>
+<span class="command">$ sudo firewall-cmd --reload</span>
+
+<span class="comment"># List all rules</span>
+<span class="command">$ sudo firewall-cmd --list-all</span></code>
+        </div>
+
+        <h2>Testing Your Firewall</h2>
+
+        <div class="code-block">
+            <code><span class="comment"># Test from another machine</span>
+<span class="command">$ nmap -p 22,80,443 your-server-ip</span>
+
+<span class="comment"># Check open ports locally</span>
+<span class="command">$ sudo ss -tulpn</span>
+<span class="command">$ sudo netstat -tulpn</span>
+
+<span class="comment"># Test specific port</span>
+<span class="command">$ telnet your-server-ip 80</span>
+<span class="command">$ nc -zv your-server-ip 80</span></code>
+        </div>
+
+        <h2>Best Practices</h2>
+
+        <ul>
+            <li><strong>Start restrictive:</strong> Deny by default, allow only what's needed</li>
+            <li><strong>Document your rules:</strong> Comment why each rule exists</li>
+            <li><strong>Test before deploying:</strong> Especially on remote servers</li>
+            <li><strong>Monitor logs:</strong> Watch for unusual blocked traffic</li>
+            <li><strong>Keep it simple:</strong> Complex rules are hard to maintain</li>
+            <li><strong>Regular audits:</strong> Remove rules you no longer need</li>
+            <li><strong>Layer security:</strong> Firewall + other security measures</li>
+        </ul>
+
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> On cloud servers (AWS, DigitalOcean, etc.), use
+            both the provider's firewall (security groups) AND a local firewall for defense
+            in depth.</p>
+        </div>
+
+        <h2>Common Scenarios</h2>
+
+        <h3>Web Server</h3>
+        <div class="code-block">
+            <code><span class="command">$ sudo ufw allow ssh</span>
+<span class="command">$ sudo ufw allow http</span>
+<span class="command">$ sudo ufw allow https</span>
+<span class="command">$ sudo ufw enable</span></code>
+        </div>
+
+        <h3>Database Server (PostgreSQL)</h3>
+        <div class="code-block">
+            <code><span class="command">$ sudo ufw allow from 192.168.1.0/24 to any port 5432</span></code>
+        </div>
+
+        <h3>Development Machine</h3>
+        <div class="code-block">
+            <code><span class="command">$ sudo ufw default deny incoming</span>
+<span class="command">$ sudo ufw default allow outgoing</span>
+<span class="command">$ sudo ufw enable</span></code>
+        </div>
+
+        <h2>Troubleshooting</h2>
+
+        <div class="code-block">
+            <code><span class="comment"># Check ufw logs</span>
+<span class="command">$ sudo tail -f /var/log/ufw.log</span>
+
+<span class="comment"># Check iptables logs</span>
+<span class="command">$ sudo dmesg | grep -i iptables</span>
+<span class="command">$ sudo journalctl -u iptables</span>
+
+<span class="comment"># Temporarily disable to test</span>
+<span class="command">$ sudo ufw disable</span>
+<span class="comment"># Test your connection</span>
+<span class="command">$ sudo ufw enable</span></code>
+        </div>
+
+        <h2>Wrapping Up</h2>
+
+        <p>
+            A properly configured firewall is non-negotiable for any Linux system exposed to
+            a network. Start with ufw for simplicity, graduate to iptables for power. Test
+            thoroughly, document well, and review regularly.
+        </p>
+
+        <nav class="article-nav">
+            <a href="automate-backups.html">[← Previous: Automate Backups]</a>
+            <a href="dev-environment.html">[Next: Dev Environment →]</a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>
+                    <span class="blink">_</span>
+                    Terminal Magazine |
+                    Licensed under CC BY-SA 4.0
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

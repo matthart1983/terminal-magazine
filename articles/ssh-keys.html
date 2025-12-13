@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Set up SSH keys for secure, password-free authentication. Step-by-step guide for Linux users.">
+    <title>Set Up SSH Keys | Terminal Magazine</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="article.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="../index.html">[Home]</a></li>
+                <li><a href="../index.html#tutorials">[Tutorials]</a></li>
+                <li><a href="../index.html#news">[News]</a></li>
+                <li><a href="../index.html#tips">[Tips & Tricks]</a></li>
+                <li><a href="../index.html#howto" class="active">[How-Tos]</a></li>
+                <li><a href="../index.html#about">[About]</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <div class="container">
+            <p class="article-meta">
+                <span class="prompt">$</span> cat /how-to/ssh-keys.md
+            </p>
+            <h1>Set Up SSH Keys</h1>
+            <p class="article-meta">
+                By <span class="author">securityninja</span> |
+                8 min read |
+                Beginner |
+                Published: December 2025
+            </p>
+        </div>
+    </header>
+
+    <main class="article-body">
+        <p class="article-excerpt">
+            SSH keys provide a more secure and convenient way to authenticate than passwords.
+            Set them up once, and you'll never type a server password again. This guide will
+            have you up and running in 5 minutes.
+        </p>
+
+        <h2>Why SSH Keys?</h2>
+
+        <p>
+            SSH keys use public-key cryptography. You generate a key pair: a private key
+            (kept secret on your machine) and a public key (shared with servers). When you
+            connect, the server verifies you have the matching private key without sending
+            the key itself over the network.
+        </p>
+
+        <p><strong>Benefits:</strong></p>
+        <ul>
+            <li>More secure than passwords (especially against brute force attacks)</li>
+            <li>No password typing — authenticate automatically</li>
+            <li>Can be passphrase-protected for extra security</li>
+            <li>Required by many services (GitHub, cloud providers, etc.)</li>
+        </ul>
+
+        <h2>Step 1: Generate Your Key Pair</h2>
+
+        <div class="code-block">
+            <code><span class="comment"># Generate a new SSH key pair (Ed25519 algorithm - recommended)</span>
+<span class="command">$ ssh-keygen -t ed25519 -C "your_email@example.com"</span>
+
+<span class="comment"># For older systems that don't support Ed25519, use RSA:</span>
+<span class="command">$ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"</span>
+
+<span class="output">Generating public/private ed25519 key pair.
+Enter file in which to save the key (/home/user/.ssh/id_ed25519):</span></code>
+        </div>
+
+        <p>Press Enter to accept the default location (<code>~/.ssh/id_ed25519</code>).</p>
+
+        <div class="code-block">
+            <code><span class="output">Enter passphrase (empty for no passphrase):</span></code>
+        </div>
+
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> Use a passphrase! It protects your private key
+            if someone gains access to your computer. Modern systems can cache it with
+            ssh-agent so you only type it once per session.</p>
+        </div>
+
+        <p>After completing, you'll have two files:</p>
+        <ul>
+            <li><code>~/.ssh/id_ed25519</code> — Your private key (never share this!)</li>
+            <li><code>~/.ssh/id_ed25519.pub</code> — Your public key (safe to share)</li>
+        </ul>
+
+        <h2>Step 2: Set Correct Permissions</h2>
+
+        <p>SSH is picky about permissions. Set them correctly:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ chmod 700 ~/.ssh</span>
+<span class="command">$ chmod 600 ~/.ssh/id_ed25519</span>
+<span class="command">$ chmod 644 ~/.ssh/id_ed25519.pub</span></code>
+        </div>
+
+        <h2>Step 3: Copy Your Public Key to a Server</h2>
+
+        <p>The easiest method uses <code>ssh-copy-id</code>:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Replace user@hostname with your actual server details</span>
+<span class="command">$ ssh-copy-id user@hostname</span>
+
+<span class="output">user@hostname's password: </span><span class="comment">(type your password one last time)</span>
+
+<span class="output">Number of key(s) added: 1
+
+Now try logging into the machine with:   "ssh 'user@hostname'"
+and check to make sure that only the key(s) you wanted were added.</span></code>
+        </div>
+
+        <p>Now test it:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ ssh user@hostname</span>
+
+<span class="comment"># You should connect without entering a password!</span></code>
+        </div>
+
+        <h3>Manual Method (if ssh-copy-id isn't available)</h3>
+
+        <div class="code-block">
+            <code><span class="comment"># Display your public key</span>
+<span class="command">$ cat ~/.ssh/id_ed25519.pub</span>
+
+<span class="comment"># Copy the output, then on the remote server:</span>
+<span class="command">$ mkdir -p ~/.ssh</span>
+<span class="command">$ chmod 700 ~/.ssh</span>
+<span class="command">$ nano ~/.ssh/authorized_keys</span>
+
+<span class="comment"># Paste your public key, save, and:</span>
+<span class="command">$ chmod 600 ~/.ssh/authorized_keys</span></code>
+        </div>
+
+        <h2>Step 4: Configure SSH Client (Optional)</h2>
+
+        <p>Make life easier with an SSH config file:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ nano ~/.ssh/config</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="output"># My web server
+Host webserver
+    HostName 192.168.1.100
+    User admin
+    IdentityFile ~/.ssh/id_ed25519
+    Port 22
+
+# GitHub
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+
+# Quick shortcut
+Host dev
+    HostName dev.example.com
+    User developer
+    ForwardAgent yes</span></code>
+        </div>
+
+        <p>Now you can connect with just:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ ssh webserver</span>
+<span class="command">$ ssh dev</span></code>
+        </div>
+
+        <h2>Using ssh-agent for Passphrase Management</h2>
+
+        <p>If you used a passphrase, <code>ssh-agent</code> caches it:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Start the agent (usually runs automatically)</span>
+<span class="command">$ eval "$(ssh-agent -s)"</span>
+<span class="output">Agent pid 12345</span>
+
+<span class="comment"># Add your key to the agent</span>
+<span class="command">$ ssh-add ~/.ssh/id_ed25519</span>
+<span class="output">Enter passphrase for /home/user/.ssh/id_ed25519: </span>
+<span class="output">Identity added: /home/user/.ssh/id_ed25519</span>
+
+<span class="comment"># List loaded keys</span>
+<span class="command">$ ssh-add -l</span></code>
+        </div>
+
+        <h2>GitHub and GitLab Setup</h2>
+
+        <p>To use SSH keys with Git hosting services:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Display your public key</span>
+<span class="command">$ cat ~/.ssh/id_ed25519.pub</span></code>
+        </div>
+
+        <p>Copy the entire output, then:</p>
+        <ul>
+            <li><strong>GitHub:</strong> Settings → SSH and GPG keys → New SSH key</li>
+            <li><strong>GitLab:</strong> Preferences → SSH Keys → Add key</li>
+            <li><strong>Bitbucket:</strong> Personal settings → SSH keys → Add key</li>
+        </ul>
+
+        <p>Test your connection:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ ssh -T git@github.com</span>
+<span class="output">Hi username! You've successfully authenticated, but GitHub does not provide shell access.</span></code>
+        </div>
+
+        <h2>Multiple Keys</h2>
+
+        <p>Need different keys for different purposes?</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Generate a key for work</span>
+<span class="command">$ ssh-keygen -t ed25519 -f ~/.ssh/id_work -C "work@company.com"</span>
+
+<span class="comment"># Generate a key for personal</span>
+<span class="command">$ ssh-keygen -t ed25519 -f ~/.ssh/id_personal -C "me@personal.com"</span></code>
+        </div>
+
+        <p>Then use your config file to specify which key for which host:</p>
+
+        <div class="code-block">
+            <code><span class="output">Host github-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_work
+
+Host github-personal
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_personal</span></code>
+        </div>
+
+        <h2>Security Best Practices</h2>
+
+        <ul>
+            <li><strong>Never share your private key</strong> — only the .pub file</li>
+            <li><strong>Use a strong passphrase</strong> — protects if your laptop is stolen</li>
+            <li><strong>Back up your keys</strong> — store securely (encrypted USB, password manager)</li>
+            <li><strong>Disable password authentication</strong> on servers (edit <code>/etc/ssh/sshd_config</code>)</li>
+            <li><strong>Rotate keys periodically</strong> — generate new ones every year or two</li>
+        </ul>
+
+        <h2>Troubleshooting</h2>
+
+        <div class="code-block">
+            <code><span class="comment"># Verbose output to debug connection issues</span>
+<span class="command">$ ssh -v user@hostname</span>
+
+<span class="comment"># Test which key is being used</span>
+<span class="command">$ ssh -vT git@github.com</span>
+
+<span class="comment"># Check permissions</span>
+<span class="command">$ ls -la ~/.ssh/</span></code>
+        </div>
+
+        <div class="warning-box">
+            <p><strong>Common Issue:</strong> "Permission denied (publickey)" usually means:
+            wrong permissions on .ssh directory, public key not added to authorized_keys,
+            or using the wrong key file.</p>
+        </div>
+
+        <h2>Wrapping Up</h2>
+
+        <p>
+            SSH keys are a fundamental tool for secure remote access. Once set up, they make
+            your workflow faster and your systems more secure. Take 10 minutes to configure
+            them properly, and you'll benefit for years.
+        </p>
+
+        <nav class="article-nav">
+            <a href="../index.html">[← Back to Home]</a>
+            <a href="automate-backups.html">[Next: Automate Backups →]</a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>
+                    <span class="blink">_</span>
+                    Terminal Magazine |
+                    Licensed under CC BY-SA 4.0
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

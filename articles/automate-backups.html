@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Automate Linux backups with rsync and cron. Protect your data with scheduled, incremental backups.">
+    <title>Automate Backups with rsync and cron | Terminal Magazine</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="article.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="../index.html">[Home]</a></li>
+                <li><a href="../index.html#tutorials">[Tutorials]</a></li>
+                <li><a href="../index.html#news">[News]</a></li>
+                <li><a href="../index.html#tips">[Tips & Tricks]</a></li>
+                <li><a href="../index.html#howto" class="active">[How-Tos]</a></li>
+                <li><a href="../index.html#about">[About]</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <div class="container">
+            <p class="article-meta">
+                <span class="prompt">$</span> cat /how-to/automate-backups.md
+            </p>
+            <h1>Automate Backups with rsync and cron</h1>
+            <p class="article-meta">
+                By <span class="author">backupmaster</span> |
+                12 min read |
+                Intermediate |
+                Published: December 2025
+            </p>
+        </div>
+    </header>
+
+    <main class="article-body">
+        <p class="article-excerpt">
+            Data loss is devastating. But with rsync and cron, you can automate backups that
+            run reliably in the background. Set it up once, verify it works, and sleep better
+            knowing your files are safe.
+        </p>
+
+        <h2>The Backup Strategy</h2>
+
+        <p>
+            We'll use <strong>rsync</strong> to copy files efficiently (only changes get
+            transferred) and <strong>cron</strong> to run backups automatically on a schedule.
+            This approach is battle-tested, fast, and works on any Linux system.
+        </p>
+
+        <p><strong>What to backup:</strong></p>
+        <ul>
+            <li>Home directory (<code>/home/username</code>)</li>
+            <li>Configuration files (<code>/etc</code> — requires root)</li>
+            <li>Custom scripts and projects</li>
+            <li>Databases (export first, then backup the dumps)</li>
+        </ul>
+
+        <p><strong>Where to backup:</strong></p>
+        <ul>
+            <li>External USB drive</li>
+            <li>Network attached storage (NAS)</li>
+            <li>Remote server over SSH</li>
+            <li>Cloud storage (with tools like rclone)</li>
+        </ul>
+
+        <h2>Understanding rsync</h2>
+
+        <p>Basic rsync syntax:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ rsync [options] source destination</span></code>
+        </div>
+
+        <p>Essential options:</p>
+
+        <table>
+            <tr>
+                <th>Option</th>
+                <th>Meaning</th>
+            </tr>
+            <tr><td><code>-a</code></td><td>Archive mode (preserves permissions, timestamps, etc.)</td></tr>
+            <tr><td><code>-v</code></td><td>Verbose output</td></tr>
+            <tr><td><code>-z</code></td><td>Compress data during transfer</td></tr>
+            <tr><td><code>-h</code></td><td>Human-readable numbers</td></tr>
+            <tr><td><code>--delete</code></td><td>Delete files in dest that aren't in source</td></tr>
+            <tr><td><code>--exclude</code></td><td>Skip certain files/directories</td></tr>
+            <tr><td><code>--dry-run</code></td><td>Test without actually copying</td></tr>
+        </table>
+
+        <h2>Basic Local Backup</h2>
+
+        <p>Backup your home directory to an external drive:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Mount your external drive (example: /media/backup)</span>
+
+<span class="comment"># Test run first</span>
+<span class="command">$ rsync -avh --dry-run /home/user/ /media/backup/home-backup/</span>
+
+<span class="comment"># Actual backup</span>
+<span class="command">$ rsync -avh /home/user/ /media/backup/home-backup/</span>
+
+<span class="output">sending incremental file list
+./
+.bashrc
+.profile
+Documents/
+Documents/notes.txt
+Pictures/
+Pictures/vacation.jpg
+...
+sent 1.23G bytes  received 5.67K bytes  12.34M bytes/sec
+total size is 1.23G  speedup is 1.00</span></code>
+        </div>
+
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> Note the trailing slash on the source directory
+            (<code>/home/user/</code>). This copies the <em>contents</em> of the directory.
+            Without it (<code>/home/user</code>), rsync creates a <code>user</code> folder
+            inside the destination.</p>
+        </div>
+
+        <h2>Excluding Files</h2>
+
+        <p>Skip cache, temp files, and large directories you don't need:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ rsync -avh \
+  --exclude='.cache' \
+  --exclude='Downloads/' \
+  --exclude='*.tmp' \
+  --exclude='node_modules/' \
+  --exclude='.npm' \
+  --exclude='.local/share/Trash' \
+  /home/user/ /media/backup/home-backup/</span></code>
+        </div>
+
+        <p>Or use an exclude file:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ nano ~/.backup-exclude</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="output">.cache
+.local/share/Trash
+Downloads/
+*.tmp
+*.log
+node_modules/
+__pycache__/</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="command">$ rsync -avh --exclude-from='/home/user/.backup-exclude' \
+  /home/user/ /media/backup/home-backup/</span></code>
+        </div>
+
+        <h2>Remote Backup Over SSH</h2>
+
+        <p>Backup to a remote server (requires SSH access):</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Backup TO remote server</span>
+<span class="command">$ rsync -avz /home/user/ user@backup-server:/backups/laptop/</span>
+
+<span class="comment"># Backup FROM remote server to local</span>
+<span class="command">$ rsync -avz user@backup-server:/important-data/ /local/backup/</span>
+
+<span class="comment"># Use specific SSH key</span>
+<span class="command">$ rsync -avz -e "ssh -i ~/.ssh/backup_key" \
+  /home/user/ user@backup-server:/backups/</span></code>
+        </div>
+
+        <h2>Creating a Backup Script</h2>
+
+        <p>Put it all together in a reusable script:</p>
+
+        <div class="code-block">
+            <code><span class="command">$ nano ~/backup.sh</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+# Automated backup script
+
+# Configuration
+SOURCE="/home/$USER"
+DEST="/media/backup/laptop-backup"
+EXCLUDE_FILE="$HOME/.backup-exclude"
+LOG_FILE="$HOME/backup.log"
+DATE=$(date +"%Y-%m-%d %H:%M:%S")
+
+# Check if backup destination is mounted
+if [ ! -d "$DEST" ]; then
+    echo "[$DATE] ERROR: Backup destination not found: $DEST" >> "$LOG_FILE"
+    exit 1
+fi
+
+# Run the backup
+echo "[$DATE] Starting backup..." >> "$LOG_FILE"
+
+rsync -avh \
+    --delete \
+    --exclude-from="$EXCLUDE_FILE" \
+    "$SOURCE/" "$DEST/" >> "$LOG_FILE" 2>&1
+
+if [ $? -eq 0 ]; then
+    echo "[$DATE] Backup completed successfully" >> "$LOG_FILE"
+else
+    echo "[$DATE] Backup failed with error code $?" >> "$LOG_FILE"
+    exit 1
+fi
+
+# Display disk usage
+USAGE=$(du -sh "$DEST" | cut -f1)
+echo "[$DATE] Backup size: $USAGE" >> "$LOG_FILE"
+echo "" >> "$LOG_FILE"</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="comment"># Make it executable</span>
+<span class="command">$ chmod +x ~/backup.sh</span>
+
+<span class="comment"># Test it</span>
+<span class="command">$ ~/backup.sh</span>
+
+<span class="comment"># Check the log</span>
+<span class="command">$ tail ~/backup.log</span></code>
+        </div>
+
+        <h2>Scheduling with cron</h2>
+
+        <p>Run backups automatically at scheduled times:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Edit your crontab</span>
+<span class="command">$ crontab -e</span></code>
+        </div>
+
+        <p>Add one of these lines:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Run daily at 2 AM</span>
+<span class="output">0 2 * * * /home/user/backup.sh</span>
+
+<span class="comment"># Run every 6 hours</span>
+<span class="output">0 */6 * * * /home/user/backup.sh</span>
+
+<span class="comment"># Run Monday-Friday at 11 PM</span>
+<span class="output">0 23 * * 1-5 /home/user/backup.sh</span>
+
+<span class="comment"># Run every Sunday at 3 AM</span>
+<span class="output">0 3 * * 0 /home/user/backup.sh</span></code>
+        </div>
+
+        <h3>Cron Syntax Quick Reference</h3>
+
+        <div class="code-block">
+            <code><span class="output">* * * * * command
+│ │ │ │ │
+│ │ │ │ └─── Day of week (0-7, 0 and 7 = Sunday)
+│ │ │ └───── Month (1-12)
+│ │ └─────── Day of month (1-31)
+│ └───────── Hour (0-23)
+└─────────── Minute (0-59)</span></code>
+        </div>
+
+        <div class="code-block">
+            <code><span class="comment"># List your cron jobs</span>
+<span class="command">$ crontab -l</span>
+
+<span class="comment"># Check cron logs</span>
+<span class="command">$ grep CRON /var/log/syslog | tail -20</span></code>
+        </div>
+
+        <h2>Incremental Backups with Timestamps</h2>
+
+        <p>Keep multiple backup versions:</p>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+# Incremental backup with date-stamped directories
+
+SOURCE="/home/$USER"
+BACKUP_ROOT="/media/backup"
+DATE=$(date +%Y-%m-%d)
+DEST="$BACKUP_ROOT/$DATE"
+LATEST="$BACKUP_ROOT/latest"
+
+# Create new backup linked to previous (saves space)
+rsync -avh \
+    --delete \
+    --link-dest="$LATEST" \
+    "$SOURCE/" "$DEST/"
+
+# Update the 'latest' symlink
+rm -f "$LATEST"
+ln -s "$DEST" "$LATEST"
+
+# Keep only last 7 days of backups
+find "$BACKUP_ROOT" -maxdepth 1 -type d -mtime +7 -exec rm -rf {} \;</span></code>
+        </div>
+
+        <p>This creates one full backup, then daily incrementals that only store changes.</p>
+
+        <h2>Backup Verification</h2>
+
+        <p>Always verify your backups work:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Check backup was created</span>
+<span class="command">$ ls -lh /media/backup/</span>
+
+<span class="comment"># Compare source and backup</span>
+<span class="command">$ rsync -avhn --delete /home/user/ /media/backup/home-backup/</span>
+
+<span class="comment"># Test restoring a single file</span>
+<span class="command">$ cp /media/backup/home-backup/Documents/test.txt ~/test-restored.txt</span>
+
+<span class="comment"># Verify checksums match</span>
+<span class="command">$ diff /home/user/Documents/test.txt ~/test-restored.txt</span></code>
+        </div>
+
+        <h2>Advanced: Remote Backup with Email Alerts</h2>
+
+        <div class="code-block">
+            <code><span class="output">#!/bin/bash
+# Backup script with email notification
+
+SOURCE="/home/$USER"
+DEST="user@backup-server:/backups/laptop"
+LOG="/tmp/backup-$$.log"
+
+# Run backup
+rsync -avz --delete "$SOURCE/" "$DEST" &> "$LOG"
+
+if [ $? -eq 0 ]; then
+    STATUS="SUCCESS"
+else
+    STATUS="FAILED"
+fi
+
+# Send email (requires mail command)
+mail -s "Backup $STATUS - $(date)" user@example.com < "$LOG"
+
+rm "$LOG"</span></code>
+        </div>
+
+        <h2>Best Practices</h2>
+
+        <ul>
+            <li><strong>3-2-1 Rule:</strong> 3 copies, 2 different media types, 1 offsite</li>
+            <li><strong>Test restores:</strong> A backup you can't restore is useless</li>
+            <li><strong>Monitor logs:</strong> Check backup logs regularly</li>
+            <li><strong>Encrypt sensitive data:</strong> Use rsync over SSH or encrypted drives</li>
+            <li><strong>Automate everything:</strong> Manual backups get forgotten</li>
+            <li><strong>Keep multiple versions:</strong> Don't overwrite the only backup</li>
+        </ul>
+
+        <div class="warning-box">
+            <p><strong>Warning:</strong> The <code>--delete</code> flag removes files from
+            the destination that don't exist in the source. Test thoroughly before using it!</p>
+        </div>
+
+        <h2>Wrapping Up</h2>
+
+        <p>
+            Backups are insurance — boring but essential. Spend an hour setting up automated
+            backups now, and save yourself from potential disaster later. Your future self
+            will thank you.
+        </p>
+
+        <nav class="article-nav">
+            <a href="ssh-keys.html">[← Previous: SSH Keys]</a>
+            <a href="configure-firewall.html">[Next: Configure Firewall →]</a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>
+                    <span class="blink">_</span>
+                    Terminal Magazine |
+                    Licensed under CC BY-SA 4.0
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
