@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn the Linux command line from scratch. A beginner-friendly tutorial covering essential commands, navigation, and bash basics.">
+    <title>Getting Started with the Linux Command Line | Terminal Magazine</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* Article-specific styles */
+        .article-header {
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--accent-green);
+            padding: var(--space-xl) 0;
+        }
+
+        .article-header h1 {
+            font-size: 2rem;
+            color: var(--accent-amber);
+            margin-bottom: var(--space-md);
+        }
+
+        .article-body {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+        }
+
+        .article-body h2 {
+            color: var(--accent-green);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .article-body h2:first-of-type {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .article-body p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .code-block {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--accent-green);
+            padding: var(--space-md);
+            margin: var(--space-lg) 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+            display: block;
+            white-space: pre;
+        }
+
+        .code-block .comment {
+            color: var(--text-muted);
+        }
+
+        .code-block .command {
+            color: var(--accent-green);
+        }
+
+        .code-block .output {
+            color: var(--text-secondary);
+        }
+
+        .tip-box {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--accent-amber);
+            padding: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .tip-box strong {
+            color: var(--accent-amber);
+            font-family: var(--font-mono);
+        }
+
+        .warning-box {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--accent-red);
+            padding: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .warning-box strong {
+            color: var(--accent-red);
+            font-family: var(--font-mono);
+        }
+
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .article-nav a {
+            font-family: var(--font-mono);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--space-lg) 0;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-secondary);
+            color: var(--accent-green);
+        }
+
+        td code {
+            color: var(--accent-amber);
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="../index.html">[Home]</a></li>
+                <li><a href="../index.html#tutorials" class="active">[Tutorials]</a></li>
+                <li><a href="../index.html#news">[News]</a></li>
+                <li><a href="../index.html#tips">[Tips & Tricks]</a></li>
+                <li><a href="../index.html#howto">[How-Tos]</a></li>
+                <li><a href="../index.html#about">[About]</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <div class="container">
+            <p class="article-meta">
+                <span class="prompt">$</span> cat /tutorials/cli-basics.md
+            </p>
+            <h1>Getting Started with the Linux Command Line</h1>
+            <p class="article-meta">
+                By <span class="author">sysadmin</span> |
+                15 min read |
+                Beginner |
+                Published: December 2025
+            </p>
+        </div>
+    </header>
+
+    <main class="article-body">
+        <p class="article-excerpt">
+            The command line is where the real power of Linux lives. While graphical
+            interfaces are nice, nothing beats the efficiency and control of a well-crafted
+            shell command. In this tutorial, we'll take you from zero to hero.
+        </p>
+
+        <h2>Why Learn the Command Line?</h2>
+
+        <p>
+            Before we dive in, let's talk about why you should bother learning the command
+            line when perfectly good GUIs exist. Here's the truth: once you get comfortable
+            with the terminal, you'll be faster, more efficient, and have access to tools
+            that simply don't exist in graphical form.
+        </p>
+
+        <p>
+            The command line is also universal. The commands you learn today will work on
+            any Linux distribution, on macOS, on servers, on Raspberry Pis, and even in
+            the cloud. That's a skill that pays dividends forever.
+        </p>
+
+        <h2>Opening the Terminal</h2>
+
+        <p>
+            First things first: let's open a terminal. On most Linux distributions, you can:
+        </p>
+
+        <ul>
+            <li>Press <code>Ctrl+Alt+T</code> (works on Ubuntu, Fedora, and many others)</li>
+            <li>Search for "Terminal" in your application menu</li>
+            <li>Right-click on the desktop and select "Open Terminal"</li>
+        </ul>
+
+        <p>
+            You'll see a window with a prompt that looks something like this:
+        </p>
+
+        <div class="code-block">
+            <code><span class="command">user@hostname:~$</span> <span class="output">_</span></code>
+        </div>
+
+        <p>
+            This prompt tells you who you are (<code>user</code>), what machine you're on
+            (<code>hostname</code>), and where you are (<code>~</code>, which means your
+            home directory). The <code>$</code> indicates you're a regular user. If you
+            see a <code>#</code>, you're running as root (the superuser).
+        </p>
+
+        <h2>Your First Commands</h2>
+
+        <p>
+            Let's start with the basics. Type each command and press Enter:
+        </p>
+
+        <div class="code-block">
+            <code><span class="comment"># Who am I?</span>
+<span class="command">$ whoami</span>
+<span class="output">user</span>
+
+<span class="comment"># What's today's date?</span>
+<span class="command">$ date</span>
+<span class="output">Sat Dec 14 10:30:00 AEDT 2025</span>
+
+<span class="comment"># What directory am I in?</span>
+<span class="command">$ pwd</span>
+<span class="output">/home/user</span>
+
+<span class="comment"># What's in this directory?</span>
+<span class="command">$ ls</span>
+<span class="output">Desktop  Documents  Downloads  Music  Pictures  Videos</span></code>
+        </div>
+
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> Use the up and down arrow keys to scroll through
+            your command history. This saves tons of typing!</p>
+        </div>
+
+        <h2>Navigating the Filesystem</h2>
+
+        <p>
+            Linux organizes everything in a tree structure starting from the root directory
+            (<code>/</code>). Here are the essential navigation commands:
+        </p>
+
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>What it does</th>
+            </tr>
+            <tr>
+                <td><code>pwd</code></td>
+                <td>Print working directory (where am I?)</td>
+            </tr>
+            <tr>
+                <td><code>ls</code></td>
+                <td>List directory contents</td>
+            </tr>
+            <tr>
+                <td><code>cd</code></td>
+                <td>Change directory</td>
+            </tr>
+            <tr>
+                <td><code>cd ..</code></td>
+                <td>Go up one directory</td>
+            </tr>
+            <tr>
+                <td><code>cd ~</code></td>
+                <td>Go to your home directory</td>
+            </tr>
+            <tr>
+                <td><code>cd -</code></td>
+                <td>Go to previous directory</td>
+            </tr>
+        </table>
+
+        <p>Let's practice:</p>
+
+        <div class="code-block">
+            <code><span class="comment"># Go to the root directory</span>
+<span class="command">$ cd /</span>
+
+<span class="comment"># See what's there</span>
+<span class="command">$ ls</span>
+<span class="output">bin  boot  dev  etc  home  lib  media  mnt  opt  proc  root  sbin  srv  sys  tmp  usr  var</span>
+
+<span class="comment"># Go to /etc (system configuration files)</span>
+<span class="command">$ cd /etc</span>
+
+<span class="comment"># Jump back home</span>
+<span class="command">$ cd ~</span>
+
+<span class="comment"># Or just type cd with no arguments</span>
+<span class="command">$ cd</span></code>
+        </div>
+
+        <h2>Listing Files Like a Pro</h2>
+
+        <p>
+            The <code>ls</code> command has many useful options:
+        </p>
+
+        <div class="code-block">
+            <code><span class="comment"># Long format with details</span>
+<span class="command">$ ls -l</span>
+<span class="output">drwxr-xr-x 2 user user 4096 Dec 14 09:00 Desktop
+-rw-r--r-- 1 user user  220 Dec 14 08:00 .bashrc</span>
+
+<span class="comment"># Show hidden files (starting with .)</span>
+<span class="command">$ ls -a</span>
+<span class="output">.  ..  .bashrc  .config  Desktop  Documents</span>
+
+<span class="comment"># Human-readable file sizes</span>
+<span class="command">$ ls -lh</span>
+
+<span class="comment"># Combine them all!</span>
+<span class="command">$ ls -lah</span></code>
+        </div>
+
+        <h2>Creating and Managing Files</h2>
+
+        <p>
+            Now let's create some files and directories:
+        </p>
+
+        <div class="code-block">
+            <code><span class="comment"># Create a new directory</span>
+<span class="command">$ mkdir projects</span>
+
+<span class="comment"># Create nested directories</span>
+<span class="command">$ mkdir -p projects/linux/tutorials</span>
+
+<span class="comment"># Create an empty file</span>
+<span class="command">$ touch myfile.txt</span>
+
+<span class="comment"># Copy a file</span>
+<span class="command">$ cp myfile.txt myfile-backup.txt</span>
+
+<span class="comment"># Move (or rename) a file</span>
+<span class="command">$ mv myfile.txt projects/</span>
+
+<span class="comment"># Remove a file</span>
+<span class="command">$ rm myfile-backup.txt</span>
+
+<span class="comment"># Remove a directory (must be empty)</span>
+<span class="command">$ rmdir projects/linux/tutorials</span>
+
+<span class="comment"># Remove a directory and everything in it</span>
+<span class="command">$ rm -r projects/linux</span></code>
+        </div>
+
+        <div class="warning-box">
+            <p><strong>Warning:</strong> The <code>rm</code> command is permanent! There's
+            no trash can. Double-check before you press Enter, especially with
+            <code>rm -r</code>.</p>
+        </div>
+
+        <h2>Reading Files</h2>
+
+        <p>
+            Several commands let you view file contents:
+        </p>
+
+        <div class="code-block">
+            <code><span class="comment"># Display entire file</span>
+<span class="command">$ cat /etc/hostname</span>
+<span class="output">mycomputer</span>
+
+<span class="comment"># View file with paging (space to scroll, q to quit)</span>
+<span class="command">$ less /etc/passwd</span>
+
+<span class="comment"># Show first 10 lines</span>
+<span class="command">$ head /etc/passwd</span>
+
+<span class="comment"># Show last 10 lines</span>
+<span class="command">$ tail /etc/passwd</span>
+
+<span class="comment"># Show first 5 lines</span>
+<span class="command">$ head -n 5 /etc/passwd</span></code>
+        </div>
+
+        <h2>Getting Help</h2>
+
+        <p>
+            Stuck? Linux has built-in documentation for almost everything:
+        </p>
+
+        <div class="code-block">
+            <code><span class="comment"># Read the manual page</span>
+<span class="command">$ man ls</span>
+
+<span class="comment"># Quick help (most commands support this)</span>
+<span class="command">$ ls --help</span>
+
+<span class="comment"># What is this command?</span>
+<span class="command">$ whatis ls</span>
+<span class="output">ls (1) - list directory contents</span></code>
+        </div>
+
+        <div class="tip-box">
+            <p><strong>Pro Tip:</strong> In man pages, press <code>/</code> to search,
+            <code>n</code> for next result, and <code>q</code> to quit.</p>
+        </div>
+
+        <h2>Wrapping Up</h2>
+
+        <p>
+            Congratulations! You now know the fundamental commands that every Linux user
+            needs. Here's a quick reference:
+        </p>
+
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>Purpose</th>
+            </tr>
+            <tr><td><code>pwd</code></td><td>Where am I?</td></tr>
+            <tr><td><code>ls</code></td><td>What's here?</td></tr>
+            <tr><td><code>cd</code></td><td>Go somewhere</td></tr>
+            <tr><td><code>mkdir</code></td><td>Create directory</td></tr>
+            <tr><td><code>touch</code></td><td>Create file</td></tr>
+            <tr><td><code>cp</code></td><td>Copy</td></tr>
+            <tr><td><code>mv</code></td><td>Move/rename</td></tr>
+            <tr><td><code>rm</code></td><td>Delete</td></tr>
+            <tr><td><code>cat</code></td><td>View file</td></tr>
+            <tr><td><code>man</code></td><td>Get help</td></tr>
+        </table>
+
+        <p>
+            The best way to learn is to practice. Open a terminal, explore your filesystem,
+            create some test files, and don't be afraid to experiment. That's the joy of
+            Linux — it's yours to explore.
+        </p>
+
+        <p>
+            In our next tutorial, we'll cover piping, redirection, and combining commands
+            to do powerful things. Stay tuned!
+        </p>
+
+        <nav class="article-nav">
+            <a href="../index.html">[← Back to Home]</a>
+            <a href="#">[Next: Pipes & Redirection →]</a>
+        </nav>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>
+                    <span class="blink">_</span>
+                    Terminal Magazine |
+                    Made with vim and too much coffee |
+                    Licensed under CC BY-SA 4.0
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Terminal Magazine - Your guide to the joy of Linux computing. Tutorials, tips, news and how-tos for enthusiasts.">
+    <title>Terminal Magazine | The Joy of Linux Computing</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="masthead">
+        <div class="container">
+            <div class="masthead-content">
+                <pre class="ascii-logo">
+ _____                   _             _
+|_   _|__ _ __ _ __ ___ (_)_ __   __ _| |
+  | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | |
+  | |  __/ |  | | | | | | | | | | (_| | |
+  |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_|
+   __  __                        _
+  |  \/  | __ _  __ _  __ _ ____(_)_ __   ___
+  | |\/| |/ _` |/ _` |/ _` |_  /| | '_ \ / _ \
+  | |  | | (_| | (_| | (_| |/ / | | | | |  __/
+  |_|  |_|\__,_|\__, |\__,_/___|_|_| |_|\___|
+                |___/
+                </pre>
+                <p class="tagline">Your guide to the joy of Linux computing</p>
+                <p class="issue-info">Issue #001 | December 2025 | Free as in Freedom</p>
+            </div>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="index.html" class="active">[Home]</a></li>
+                <li><a href="#tutorials">[Tutorials]</a></li>
+                <li><a href="#news">[News]</a></li>
+                <li><a href="#tips">[Tips & Tricks]</a></li>
+                <li><a href="#howto">[How-Tos]</a></li>
+                <li><a href="#about">[About]</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Featured Article -->
+        <section class="featured">
+            <div class="section-header">
+                <span class="prompt">root@terminal:~#</span> cat /featured/article.txt
+            </div>
+            <article class="featured-article">
+                <h2>Getting Started with the Linux Command Line</h2>
+                <p class="article-meta">By <span class="author">sysadmin</span> | 15 min read | Beginner</p>
+                <p class="article-excerpt">
+                    The command line is where the real power of Linux lives. While graphical
+                    interfaces are nice, nothing beats the efficiency and control of a well-crafted
+                    shell command. In this tutorial, we'll take you from zero to hero with the
+                    basics of bash, file navigation, and essential commands every Linux user
+                    should know.
+                </p>
+                <div class="code-preview">
+                    <pre><code>$ whoami
+enthusiast
+$ echo "Welcome to Linux!"
+Welcome to Linux!
+$ ls -la /home/
+total 12
+drwxr-xr-x  3 root root 4096 Dec 14 09:00 .
+drwxr-xr-x 19 root root 4096 Dec 14 09:00 ..
+drwxr-xr-x  4 user user 4096 Dec 14 09:00 user</code></pre>
+                </div>
+                <a href="articles/cli-basics.html" class="read-more">[Read Full Article →]</a>
+            </article>
+        </section>
+
+        <!-- Two Column Layout -->
+        <div class="two-column">
+            <!-- Tutorials Column -->
+            <section class="column" id="tutorials">
+                <div class="section-header">
+                    <span class="prompt">$</span> ls /tutorials/
+                </div>
+
+                <article class="article-card">
+                    <h3>Setting Up Your First Web Server</h3>
+                    <p class="article-meta">Intermediate | 20 min</p>
+                    <p>Learn to configure Apache or Nginx from scratch. Serve your first webpage to the world.</p>
+                    <a href="#" class="read-more">[Read →]</a>
+                </article>
+
+                <article class="article-card">
+                    <h3>Vim: The Editor You'll Love to Learn</h3>
+                    <p class="article-meta">Beginner | 12 min</p>
+                    <p>Stop fearing Vim. This gentle introduction will have you editing like a pro.</p>
+                    <a href="#" class="read-more">[Read →]</a>
+                </article>
+
+                <article class="article-card">
+                    <h3>Shell Scripting Fundamentals</h3>
+                    <p class="article-meta">Beginner | 25 min</p>
+                    <p>Automate your workflow with bash scripts. Variables, loops, and conditionals explained.</p>
+                    <a href="#" class="read-more">[Read →]</a>
+                </article>
+
+                <article class="article-card">
+                    <h3>Understanding File Permissions</h3>
+                    <p class="article-meta">Beginner | 10 min</p>
+                    <p>chmod, chown, and the mystery of rwxr-xr-x finally demystified.</p>
+                    <a href="#" class="read-more">[Read →]</a>
+                </article>
+            </section>
+
+            <!-- News Column -->
+            <section class="column" id="news">
+                <div class="section-header">
+                    <span class="prompt">$</span> tail -f /var/log/news
+                </div>
+
+                <article class="news-item">
+                    <span class="news-date">[Dec 14]</span>
+                    <h4>Linux Kernel 6.7 Released</h4>
+                    <p>New features include improved hardware support and performance optimizations.</p>
+                </article>
+
+                <article class="news-item">
+                    <span class="news-date">[Dec 12]</span>
+                    <h4>Fedora 40 Beta Now Available</h4>
+                    <p>Test the latest Fedora release with GNOME 46 and updated packages.</p>
+                </article>
+
+                <article class="news-item">
+                    <span class="news-date">[Dec 10]</span>
+                    <h4>FOSS Project of the Month: btop++</h4>
+                    <p>A beautiful resource monitor for your terminal. Written in C++.</p>
+                </article>
+
+                <article class="news-item">
+                    <span class="news-date">[Dec 08]</span>
+                    <h4>Raspberry Pi 5 Gets Official NVMe Support</h4>
+                    <p>Boot from blazing fast NVMe drives with the new HAT+ accessory.</p>
+                </article>
+
+                <article class="news-item">
+                    <span class="news-date">[Dec 05]</span>
+                    <h4>Wine 9.0 Brings DirectX 12 Improvements</h4>
+                    <p>Run more Windows games on Linux than ever before.</p>
+                </article>
+            </section>
+        </div>
+
+        <!-- Tips Section -->
+        <section class="tips-section" id="tips">
+            <div class="section-header">
+                <span class="prompt">$</span> cat /tips/quick-wins.txt
+            </div>
+
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <span class="tip-number">#001</span>
+                    <h4>Reverse Search</h4>
+                    <p>Press <code>Ctrl+R</code> and type to search your command history. Game changer.</p>
+                </div>
+
+                <div class="tip-card">
+                    <span class="tip-number">#002</span>
+                    <h4>Quick Directory Jump</h4>
+                    <p>Use <code>cd -</code> to jump back to your previous directory instantly.</p>
+                </div>
+
+                <div class="tip-card">
+                    <span class="tip-number">#003</span>
+                    <h4>Run Previous Command</h4>
+                    <p>Forgot sudo? Just type <code>sudo !!</code> to re-run the last command as root.</p>
+                </div>
+
+                <div class="tip-card">
+                    <span class="tip-number">#004</span>
+                    <h4>Create Nested Dirs</h4>
+                    <p><code>mkdir -p foo/bar/baz</code> creates the entire path in one go.</p>
+                </div>
+
+                <div class="tip-card">
+                    <span class="tip-number">#005</span>
+                    <h4>Watch Command Output</h4>
+                    <p><code>watch -n 1 command</code> runs a command every second. Great for monitoring.</p>
+                </div>
+
+                <div class="tip-card">
+                    <span class="tip-number">#006</span>
+                    <h4>Find Large Files</h4>
+                    <p><code>du -h | sort -hr | head -20</code> shows your biggest disk hogs.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How-To Section -->
+        <section class="howto-section" id="howto">
+            <div class="section-header">
+                <span class="prompt">$</span> man how-to
+            </div>
+
+            <div class="howto-grid">
+                <article class="howto-card">
+                    <div class="howto-icon">[SSH]</div>
+                    <h3>Set Up SSH Keys</h3>
+                    <p>Never type a password again. Secure, convenient authentication in 5 minutes.</p>
+                    <a href="#" class="read-more">[Learn How →]</a>
+                </article>
+
+                <article class="howto-card">
+                    <div class="howto-icon">[BAK]</div>
+                    <h3>Automate Backups</h3>
+                    <p>Use rsync and cron to protect your data. Set it and forget it.</p>
+                    <a href="#" class="read-more">[Learn How →]</a>
+                </article>
+
+                <article class="howto-card">
+                    <div class="howto-icon">[NET]</div>
+                    <h3>Configure a Firewall</h3>
+                    <p>Lock down your system with iptables or ufw. Essential security basics.</p>
+                    <a href="#" class="read-more">[Learn How →]</a>
+                </article>
+
+                <article class="howto-card">
+                    <div class="howto-icon">[DEV]</div>
+                    <h3>Set Up a Dev Environment</h3>
+                    <p>Git, your favorite editor, and a clean workflow. Start coding today.</p>
+                    <a href="#" class="read-more">[Learn How →]</a>
+                </article>
+            </div>
+        </section>
+
+        <!-- Sidebar Quote -->
+        <aside class="magazine-quote">
+            <blockquote>
+                "Software is like sex: it's better when it's free."
+                <cite>— Linus Torvalds</cite>
+            </blockquote>
+        </aside>
+
+    </main>
+
+    <footer class="site-footer" id="about">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About Terminal Magazine</h4>
+                    <p>
+                        Terminal Magazine is a love letter to the Linux community. We believe
+                        computing should be fun, accessible, and free. Our mission is to help
+                        enthusiasts of all levels discover the joy of open source software.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">[RSS Feed]</a></li>
+                        <li><a href="#">[Email Newsletter]</a></li>
+                        <li><a href="#">[Contribute]</a></li>
+                        <li><a href="#">[Contact]</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <pre class="footer-ascii">
+  ,---.
+ /     \
+|  O O  |
+|   >   |   Happy
+ \_____/    Hacking!
+                    </pre>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>
+                    <span class="blink">_</span>
+                    Made with vim and too much coffee |
+                    Licensed under CC BY-SA 4.0 |
+                    No cookies, no tracking, no nonsense
+                </p>
+                <p class="system-info">
+                    <code>uname -a: Linux terminal-mag 6.1.0 #1 SMP x86_64 GNU/Linux</code>
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
